@@ -10,5 +10,7 @@ struct Point {
 		this->eta = eta;
 	}
 
-	Point();
+	Point() {
+
+	}
 };
