@@ -3,6 +3,7 @@
 #include "Node.h"
 #include "Element.h"
 #include "GlobalData.h"
+#include "Point.h"
 
 struct Grid {
 
@@ -96,6 +97,24 @@ struct Grid {
 		std::cout << "ID4 = " << ID4 << ", x = " << nodes[ID4 - 1].x << ", y = " << nodes[ID4 - 1].y << std::endl;
 	}
 
+	Point* getElementNodes(int n) {
+		if (n > elementAmount)
+			return nullptr;
+
+		int ID1 = elements[n - 1].ID[0];
+		int ID2 = elements[n - 1].ID[1];
+		int ID3 = elements[n - 1].ID[2];
+		int ID4 = elements[n - 1].ID[3];
+
+		Point* points = new Point[4];
+
+		points[0] = Point(nodes[ID1 - 1].x, nodes[ID1 - 1].y);
+		points[1] = Point(nodes[ID2 - 1].x, nodes[ID2 - 1].y);
+		points[2] = Point(nodes[ID3 - 1].x, nodes[ID3 - 1].y);
+		points[3] = Point(nodes[ID4 - 1].x, nodes[ID4 - 1].y);
+
+		return points;
+	}
 	
 
 };
