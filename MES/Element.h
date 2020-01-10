@@ -3,6 +3,19 @@
 struct Element {
 
 	int ID[4];
+	double **HL;
+	double **CL;
+	double *PL;
+
+	~Element() {
+		for (int i = 0; i < 4; i++) {
+			delete[] HL[i];
+			delete[] CL[i];
+		}
+		delete HL;
+		delete CL;
+		delete PL;
+	}
 
 	void setID(int i, int nH) {
 		ID[0] = i;
