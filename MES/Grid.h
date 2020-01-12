@@ -25,7 +25,8 @@ struct Grid {
 	int nodeAmount;
 
 	double alfa;
-	double c;
+	double capacity;
+	double conductivity;
 	double t_am;
 	double t_in;
 	double d;
@@ -46,7 +47,8 @@ struct Grid {
 		this->nodeAmount = globalData.nN;
 
 		this->alfa = globalData.alfa;
-		this->c = globalData.c;
+		this->capacity = globalData.capacity;
+		this->conductivity = globalData.conductivity;
 		this->t_am = globalData.t_am;
 		this->t_in = globalData.t_in;
 		this->d = globalData.d;
@@ -100,11 +102,12 @@ struct Grid {
 				if (e % nH == 0)
 					e++;
 			}
+			
 	}
 
 	~Grid() {
 		delete nodes;
-		delete elements;
+		delete []elements;
 
 		for (int i = 0; i < nodeAmount; i++) {
 			delete[] HG[i];
@@ -163,11 +166,11 @@ struct Grid {
 	void setMatrixes(){
 		for(int i = 0;i < elementAmount;i++) {
 			Node* nodes = getElementNodes(i + 1);
-			elements[i].HL = universalElement->H(nodes, alfa);
-			elements[i].CL = universalElement->C(nodes, c * d);
-			elements[i].PL = universalElement->P(nodes, alfa, t_am);
+			universalElement->H(nodes, elements[i], alfa, conductivity);
+			universalElement->C(nodes, elements[i], capacity, d);
+			universalElement->P(nodes, elements[i], alfa, t_am);
+			delete nodes;
 		}
-		//delete nodes;
 	}
 	
 

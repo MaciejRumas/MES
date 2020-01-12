@@ -5,8 +5,8 @@ struct Node {
 
 	double x;
 	double y;
-	double t;		// temperatura
-	bool BC;		// warunek brzegowy
+	double t;		// temp
+	bool BC;		// binary condition
 
 	 void setBC(double H, double W) {
 		if (x == 0 || x == W || y == 0 || y == H)

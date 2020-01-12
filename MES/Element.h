@@ -7,6 +7,25 @@ struct Element {
 	double **CL;
 	double *PL;
 
+	Element() {
+		this->HL = new double* [4];
+		this->CL = new double* [4];
+		this->PL = new double [4];
+
+		for (int i = 0; i < 4; i++) {
+			this->HL[i] = new double[4];
+			this->CL[i] = new double[4];
+		}
+
+		for (int i = 0; i < 4; i++) {
+			this->PL[i] = 0;
+			for (int j = 0; j < 4; j++) {
+				this->HL[i][j] = 0;
+				this->CL[i][j] = 0;
+			}
+		}
+	}
+
 	~Element() {
 		for (int i = 0; i < 4; i++) {
 			delete[] HL[i];

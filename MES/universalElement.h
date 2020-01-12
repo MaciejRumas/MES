@@ -122,51 +122,24 @@ struct UniversalElement {
 		return tab;
 	}
 
-	double** H(Node* nodes, double alfa) {
-		double** H_l = HL(nodes, alfa);
-		double** H_bc = Hbc(nodes, alfa);
-		
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				H_l[i][j] += H_bc[i][j];
-			}
-		}
-
-		for (int i = 0; i < 4; i++) {
-			delete[] H_bc[i];
-		}
-		delete H_bc;
-
-		return H_l;
+	void H(Node* nodes, Element& element, double alfa, double conductivity) {
+		HL(nodes, element, conductivity);
+		//Hbc(nodes, element, alfa);
 	}
 
-	double** HL(Node* nodes, double alfa) {
-		double** tab = new double* [4];
-		for (int i = 0; i < 4; i++)
-			tab[i] = new double[4];
-
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				tab[i][j] = 0;
-			}
-		}
-
-		
+	void HL(Node* nodes, Element& element, double conductivity) {
 		for (int i = 1; i <= 4; i++) {
 			for (int j = 1; j <= 4; j++) {
 				for (int k = 1; k <= 4; k++) {
-					tab[i - 1][j - 1] += (dNidX(nodes, k, j) * dNidX(nodes, k, i) + dNidY(nodes, k, j) * dNidY(nodes, k, i)) * detJ(nodes, k);
+					element.HL[i - 1][j - 1] += (dNidX(nodes, k, j) * dNidX(nodes, k, i) + dNidY(nodes, k, j) * dNidY(nodes, k, i)) * detJ(nodes, k);
 				}
-				tab[i - 1][j - 1] *= alfa;
+				element.HL[i - 1][j - 1] *= conductivity;
 			}
 		}
-		return tab;
 	}
 	
-	double** Hbc(Node* nodes, double alfa) {
-		double** tab = new double* [4];
-		for (int i = 0; i < 4; i++)
-			tab[i] = new double[4];
+	void Hbc(Node* nodes, Element& element, double alfa) {
+		double tab[4][4];
 
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -193,7 +166,7 @@ struct UniversalElement {
 
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
-					tab[i][j] += ((tab1[i] * tab1[j]) + (tab2[i] * tab2[j])) * detJ ;
+					tab[i][j] += ((tab1[i] * tab1[j]) + (tab2[i] * tab2[j])) * detJ;
 				}
 			}
 
@@ -223,8 +196,8 @@ struct UniversalElement {
 		}
 		//up
 		if (nodes[2].BC && nodes[3].BC) {
-			Point p1(-1.0 / sqrt(3), 1);
-			Point p2(1.0 / sqrt(3), 1);
+			Point p1(1.0 / sqrt(3), 1);
+			Point p2(-1.0 / sqrt(3), 1);
 			double tab1[4];
 			tab1[0] = N1(p1);
 			tab1[1] = N2(p1);
@@ -246,8 +219,8 @@ struct UniversalElement {
 		}
 		//left
 		if (nodes[3].BC && nodes[0].BC) {
-			Point p1(-1, -1.0 / sqrt(3));
-			Point p2(-1, 1.0 / sqrt(3));
+			Point p1(-1, 1.0 / sqrt(3));
+			Point p2(-1, -1.0 / sqrt(3));
 			double tab1[4];
 			tab1[0] = N1(p1);
 			tab1[1] = N2(p1);
@@ -271,47 +244,33 @@ struct UniversalElement {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				tab[i][j] *= alfa;
+				element.HL[i][j] += tab[i][j];
 			}
 		}
 
-		return tab;
+	
 	}
 
-	double** C(Node* nodes, double scalar) {
-		double** tab = new double* [4];
-		for (int i = 0; i < 4; i++)
-			tab[i] = new double[4];
+	void C(Node* nodes, Element& element, double capacity, double density) {
+		double scalar = capacity * density;
 
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				tab[i][j] = 0;
-			}
-		}
-		
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				for (int k = 1; k <= 4; k++) {
-					tab[i][j] +=  tabN[k - 1][i] * tabN[k - 1][j] * detJ(nodes, k);
+					element.CL[i][j] +=  tabN[k - 1][i] * tabN[k - 1][j] * detJ(nodes, k);
 				}
-				tab[i][j] *= scalar;
+				element.CL[i][j] *= scalar;
 			}
 		}
-		return tab;
 	}
 	
-	double* P(Node* nodes, double alfa, double temp){
-		double* tab = new double[4];
-		for (int i = 0; i < 4; i++)
-			tab[i] = 0;
-
+	void P(Node* nodes, Element& element, double alfa, double temp) {
 		for(int j=0;j<4;j++){
 			for(int k=1;k<=4;k++){
-				tab[j] += tabN[k - 1][j];
+				element.PL[j] += tabN[k - 1][j];
 			}			
-			tab[j] *= - (alfa * temp);
+			element.PL[j] *= - (alfa * temp);
 		}
-
-		return tab;
 	}
 
 private:
