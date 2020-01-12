@@ -227,6 +227,18 @@ struct Grid {
 		std::cout << min << "\t\t" << max << std::endl;
 	}
 
+	void printTempMatrix() {
+		int c;
+		for (int i = 0; i < nH; i++) {
+			c = nH - i;
+			for (int j = 0; j < nW; j++) {
+				std::cout << nodes[c - 1].t << "\t";
+				c += nH;
+			}
+			std::cout << std::endl;
+		}
+	}
+
 	void nextStep() {
 		Gauss gauss;
 

@@ -16,10 +16,13 @@ int main()
 	grid->setMatrixes();
 	grid->agregate();
 
-	std::cout << "Time[s]" << "\t" << "MinTemps[s]" << "\t" << "MaxTemps[s]" << std::endl;
 	for (int i = 0; i <= globalData.time; i += globalData.step_time) {
-		std::cout << i << "\t";
+		cout << "Time[s]" << "\t" << "MinTemps[C]" << "\t" << "MaxTemps[C]" << endl;
+		cout << i << "\t";
 		grid->printMinMaxTemp();
+		cout << endl;
+		grid->printTempMatrix();
+		cout << endl;
 		grid->nextStep();
 	}
 
