@@ -5,6 +5,7 @@
 #include "GlobalData.h"
 #include "Point.h"
 #include "UniversalElement.h"
+#include "Gauss.h"
 
 struct Grid {
 
@@ -15,6 +16,9 @@ struct Grid {
 	double** CG;
 	double** HG;
 
+	double** H;
+	double* P;
+
 	double height;
 	double width;
 
@@ -24,12 +28,17 @@ struct Grid {
 	int elementAmount;
 	int nodeAmount;
 
+	double time;
+	double step_time;
+
 	double alfa;
 	double capacity;
 	double conductivity;
 	double t_am;
 	double t_in;
 	double d;
+
+
 
 	UniversalElement* universalElement;
 
@@ -52,6 +61,8 @@ struct Grid {
 		this->t_am = globalData.t_am;
 		this->t_in = globalData.t_in;
 		this->d = globalData.d;
+		this->time = globalData.time;
+		this->step_time = globalData.step_time;
 
 		this->elements = new Element[elementAmount];
 		this->nodes = new Node[nodeAmount];
@@ -67,6 +78,15 @@ struct Grid {
 		}
 
 		this->PG = new double[nodeAmount];
+
+		//New H
+		this->H = new double* [nodeAmount];
+		for (int i = 0; i < nodeAmount; i++) {
+			H[i] = new double[nodeAmount];
+		}
+
+		//New P
+		this->P = new double[nodeAmount];
 
 		//set values to 0
 		for (int i = 0; i < nodeAmount; i++) {
@@ -112,10 +132,13 @@ struct Grid {
 		for (int i = 0; i < nodeAmount; i++) {
 			delete[] HG[i];
 			delete[] CG[i];
+			delete[] H[i];
 		}
 		delete HG;
 		delete CG;
 		delete PG;
+		delete P;
+		delete H;
 	}
 
 	void printGrid() {
@@ -166,9 +189,8 @@ struct Grid {
 	void setMatrixes(){
 		for(int i = 0;i < elementAmount;i++) {
 			Node* nodes = getElementNodes(i + 1);
-			universalElement->H(nodes, elements[i], alfa, conductivity);
+			universalElement->H_P(nodes, elements[i], alfa, conductivity, t_am);
 			universalElement->C(nodes, elements[i], capacity, d);
-			universalElement->P(nodes, elements[i], alfa, t_am);
 			delete nodes;
 		}
 	}
@@ -191,4 +213,65 @@ struct Grid {
 		}
 	}
 
+	void printMinMaxTemp() {
+		double min = nodes[0].t;
+		double max = nodes[0].t;
+		
+		for (int i = 0; i < nodeAmount; i++) {
+			if (min > nodes[i].t)
+				min = nodes[i].t;
+			if (max < nodes[i].t)
+				max = nodes[i].t;
+		}
+
+		std::cout << min << "\t\t" << max << std::endl;
+	}
+
+	void nextStep() {
+		Gauss gauss;
+
+		//Fill new H
+		for (int i = 0; i < nodeAmount; i++) {
+			for (int j = 0; j < nodeAmount; j++) {
+				H[i][j] = HG[i][j] + CG[i][j] / step_time;
+			}
+		}
+
+		//Fill new P
+		double sum;
+		for (int i = 0; i < nodeAmount; i++) {
+			sum = 0;
+			for (int j = 0; j < nodeAmount; j++) {
+				sum += CG[j][i] * nodes[j].t;
+			}
+			P[i] = sum / step_time - PG[i];
+		}
+
+
+		//Gauss Matrix
+		double** matrix = new double* [nodeAmount];
+		for (int i = 0; i < nodeAmount; i++) {
+			matrix[i] = new double[nodeAmount + 1];
+		}
+
+		for (int i = 0; i < nodeAmount; i++) {
+			for (int j = 0; j < nodeAmount; j++) {
+				matrix[i][j] = H[i][j];
+			}
+			matrix[i][nodeAmount] = P[i];
+		}
+
+		gauss.createUpperMatrix(matrix, nodeAmount);
+		double* t = gauss.solve(matrix, nodeAmount);
+
+		for (int i = 0; i < nodeAmount; i++) {
+		nodes[i].t = t[i];
+		}	
+
+		for (int i = 0; i < nodeAmount; i++) {
+			delete matrix[i];
+		}
+		delete matrix;
+		delete t;
+	}
 };
