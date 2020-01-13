@@ -164,7 +164,7 @@ struct UniversalElement {
 			tab2[2] = N3(p2);
 			tab2[3] = N4(p2);
 
-			double detJ = 0.5 * (nodes[1].x - nodes[0].x);
+			double detJ = 0.5 * sqrt(pow(nodes[0].x - nodes[1].x, 2) + pow(nodes[0].y - nodes[1].y ,2));
 
 			for (int i = 0; i < 4; i++) {
 				tabP[i] += (tab1[i] + tab2[i]) * detJ;
@@ -189,7 +189,7 @@ struct UniversalElement {
 			tab2[2] = N3(p2);
 			tab2[3] = N4(p2);
 
-			double detJ = 0.5 * (nodes[2].y - nodes[1].y);
+			double detJ = 0.5 * sqrt(pow(nodes[1].x - nodes[2].x, 2) + pow(nodes[1].y - nodes[2].y, 2));
 
 			for (int i = 0; i < 4; i++) {
 				tabP[i] += (tab1[i] + tab2[i]) * detJ;
@@ -213,7 +213,7 @@ struct UniversalElement {
 			tab2[2] = N3(p2);
 			tab2[3] = N4(p2);
 
-			double detJ = 0.5 * (nodes[2].x - nodes[3].x);
+			double detJ = 0.5 * sqrt(pow(nodes[2].x - nodes[3].x, 2) + pow(nodes[2].y - nodes[3].y, 2));
 
 			for (int i = 0; i < 4; i++) {
 				tabP[i] += (tab1[i] + tab2[i]) * detJ;
@@ -237,7 +237,7 @@ struct UniversalElement {
 			tab2[2] = N3(p2);
 			tab2[3] = N4(p2);
 
-			double detJ = 0.5 * (nodes[3].y - nodes[0].y);
+			double detJ = 0.5 * sqrt(pow(nodes[3].x - nodes[0].x, 2) + pow(nodes[3].y - nodes[0].y, 2));
 
 			for (int i = 0; i < 4; i++) {
 				tabP[i] += (tab1[i] + tab2[i]) * detJ;
